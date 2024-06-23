@@ -10,9 +10,15 @@ on:
   pull_request:
     types:
       - closed
+# for testing only
+#on:
+#  push:
+#    branches: [master, staging, trying]
+#  pull_request:
+
 jobs:
   if_merged:
-    name: Publish the VS Code Extension
+    name: Publish the VS Code Extension to Open VSX
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +29,9 @@ jobs:
         with:
           node-version: '18'
       - run: npm install  --frozen-lockfile
-      - run: npm install -g vsce
+      - run: npm install -g vsce ovsx
       - run: npm run pretest
       - name: Finally, publish to the marketplace.
-        run: npm run publish --pat ${{ secrets.VS_MARKETPLACE_TOKEN }}
+        run: ovsx publish -p $OPEN_VSX_MARKETPLACE_TOKEN
+        env:
+          OPEN_VSX_MARKETPLACE_TOKEN: ${{ secrets.OPEN_VSX_MARKETPLACE_TOKEN }}
